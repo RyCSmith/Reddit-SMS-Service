@@ -1,0 +1,70 @@
+{% load static from staticfiles %}
+<html>
+<head>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="{% static 'reddit_notifier/css/styles.css' %}" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<link href='https://fonts.googleapis.com/css?family=Dosis:400,700' rel='stylesheet' type='text/css'>	
+	<title>{{user_name}}'s Account!</title>
+</head>
+<body>
+	<div id="title_bar">
+		<div id="logout_button_box" class="pull-right">
+			<form action="{% url 'reddit_notifier:request_logout' %}" method="post"> 
+				{% csrf_token %}
+				<button type="submit" class="btn btn-primary pull-right title_bar_button">Log out</button>
+				<a class="nav-link"href="{% url 'reddit_notifier:index' %}"><button type="button" id="launch_signup_button" class="btn btn-primary pull-right title_bar_button">Homepage</button></a>
+			</form>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3"></div>
+			<div class="col-md-6" id="create_sub_box">
+				<h1 class="text-center">Create a new subscription here:</h1>
+				<form action="{% url 'reddit_notifier:create_subscription' %}" method="post"> 
+		        	{% csrf_token %}
+		            <label for="subreddit_name" class="control-label">Subreddit Name</label>
+		            <input type="text" class="form-control" name="subreddit_name" id="subreddit_name">
+		            <input type="radio" name="frequency" value="2" checked> Every 2 Minutes   
+		            <input type="radio" name="frequency" value="60" > Every Hour    
+		            <input type="radio" name="frequency" value="1440" > Once Per Day    
+		            <br>
+		        	<input type="submit" class="btn btn-default" value="Create" /> 
+		    	</form>
+			</div>
+			<div class="col-md-3"></div>
+		</div>
+		<div class="row">
+			<div class="col-md-12" id="subscriptions_box">
+				{% if subscriptions_list %}
+				<h1 class="text-center">Your Current Subscriptions.</h1>
+				{% else %}
+				<h1 class="text-center">No Current Subscriptions.</h1>
+				{% endif %}
+				<ul>
+					{% for subscription in subscriptions_list %}
+					<li>
+						<form action="{% url 'reddit_notifier:delete_subscription' %}" method="post"> 
+				        	{% csrf_token %}
+				        	<label for="first_name" class="control-label">Subreddit:  {{subscription.subreddit}},</label>
+				        	{% if subscription.frequency == 2 %}
+				        		<label for="first_name" class="control-label">(Every 2 Minutes)</label>
+				        	{% elif subscription.frequency == 60 %}
+				        		<label for="first_name" class="control-label">(Every Hour)</label>
+				        	{% else %}
+				        		<label for="first_name" class="control-label">(Once Per Day)</label>
+				        	{% endif %}
+
+				        	<input type="hidden" name="subscription_id" value="{{subscription.id}}">
+				        	<input type="submit" class="btn btn-default" value="Delete" /> 
+				    	</form>
+		    		</li>
+		    		{% endfor %}
+		    	</ul>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

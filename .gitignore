@@ -1,0 +1,6 @@
+*.DS_Store
+*.pyc
+.vagrant/
+env
+__pycache__
+Alert_Services/celerybeat-schedule

@@ -1,0 +1,117 @@
+{% load static from staticfiles %}
+<html>
+<head>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="{% static 'reddit_notifier/css/styles.css' %}" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script src="{% static 'reddit_notifier/js/scripts.js' %}"></script>
+	<link href='https://fonts.googleapis.com/css?family=Dosis:400,700' rel='stylesheet' type='text/css'>	
+	<title>PromptWorks Reddit Machine!</title>
+</head>
+<body>
+	<div id="title_bar">
+		{% if loggedin %}
+			<div id="logout_button_box" class="pull-right">
+				<form action="{% url 'reddit_notifier:request_logout' %}" method="post"> 
+					{% csrf_token %}
+					<button type="submit" class="btn btn-primary pull-right title_bar_button">Log out</button>
+					<a class="nav-link"href="{% url 'reddit_notifier:my_account' %}"><button type="button" id="launch_signup_button" class="btn btn-primary pull-right title_bar_button">My Account</button></a>
+				</form>
+			</div>
+		{% else %}
+			<button type="button" id="launch_signup_button" class="btn btn-primary pull-right title_bar_button" data-toggle="modal" data-target="#signUpModal" >Sign up</button>
+			<button type="button" id="launch_signin_button" class="btn btn-primary pull-right title_bar_button" data-toggle="modal" data-target="#signInModal" >Sign in</button>
+		{% endif %}
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-8">
+				<h1 class="text-center header_text">Use the form below to have the latest subreddit post sent to your phone!</h1>
+			</div>
+			<div class="col-md-2"></div>
+		</div>
+		<div class="row">
+				<div class="col-md-3"></div>
+				<div class="col-md-6" id="request_text_form">
+					<form action="{% url 'reddit_notifier:get_subreddit_post' %}" method="post"> 
+			        	{% csrf_token %}
+			        	<label for="phone_number" class="control-label">Phone Number</label>
+			            <input type="text" class="form-control" name="phone_number" id="phone_number">
+			            <label for="subreddit_name" class="control-label">Subreddit Name</label>
+			            <input type="text" class="form-control" name="subreddit_name" id="subreddit_name">
+			        	<input type="submit" class="btn btn-default" value="Send Message" /> 
+			    	</form>
+				</div>
+				<div class="col-md-3"></div>
+		</div>
+		<div class="row">
+			<div class="col-md-3"></div>
+			<div class="col-md-6" id="alert_message_box"></div>
+			<div class="col-md-3"></div>
+		</div>
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-8">
+				<h1 id="info_text" class="text-center">Use the links above if you'd like to create an account for recurring updates!</h1>
+			</div>
+			<div class="col-md-2"></div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="signInModal" tabindex="-1" role="dialog" aria-labelledby="signInModal">
+	  <div class="modal-dialog modal-sm" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="signInModalLabel">Sign In</h4>
+	      </div>
+	      <div class="modal-body">
+	        <form action="{% url 'reddit_notifier:authentication' %}" method="post"> 
+	        	{% csrf_token %}
+	        	<label for="phone_number" class="control-label">Phone Number</label>
+	            <input type="text" class="form-control" name="phone_number" id="phone_number">
+	            <label for="user_password" class="control-label">Password</label>
+	            <input type="text" class="form-control" name="user_password" id="user_password">
+	        	<input type="submit" class="btn btn-default" value="Log In" /> 
+	    	</form>
+	      </div>
+	  	</div>
+	  </div>
+	</div>
+
+	<div class="modal fade" id="signUpModal" tabindex="-1" role="dialog" aria-labelledby="signUpModal">
+	  <div class="modal-dialog modal-sm" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="signUpModalLabel">Sign Up</h4>
+	      </div>
+	      <div class="modal-body">
+	        <form action="{% url 'reddit_notifier:signup' %}" method="post"> 
+	        	{% csrf_token %}
+	        	<label for="first_name" class="control-label">First Name</label>
+	            <input type="text" class="form-control" name="first_name" id="first_name">
+	            <label for="last_name" class="control-label">Last Name</label>
+	            <input type="text" class="form-control" name="last_name" id="last_name">
+	        	<label for="phone_number" class="control-label">Phone Number</label>
+	            <input type="text" class="form-control" name="phone_number" id="phone_number">
+	            <label for="user_password" class="control-label">Password</label>
+	            <input type="text" class="form-control" name="user_password" id="user_password">
+	        	<input type="submit" class="btn btn-default" value="Sign Up" /> 
+	    	</form>
+	      </div>
+	  	</div>
+	  </div>
+	</div>
+
+	<script type="text/javascript">
+		$('#request_text_form').on('submit', function(event){
+			$('#alert_message_box').html("<div></div>"); //clear any previous messages.
+			event.preventDefault();
+			send_message_request();
+		});
+	</script>
+</body>
+</html>
